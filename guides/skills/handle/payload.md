@@ -21,22 +21,17 @@ previous_page_id: skills/handle
 source_url: >-
   https://github.com/box/developer.box.com/blob/default/content/guides/skills/handle/payload.md
 ---
-# Parse Skills Payload
+# Skillsペイロードの解析
 
-When a new file is uploaded, copied, or moved to a folder monitored by a Skills
-app, the invocation URL that was specified during application setup and
-authentication will receive an event payload from Box.
+Skillsアプリが監視するフォルダに新しいファイルがアップロード、コピー、または移動されると、アプリケーションの設定および認証中に指定された呼び出しURLに、Boxからイベントペイロードが送られます。
 
-The event payload will contain all information needed to read in the content of
-the uploaded file to send to a processing system, such as a machine learning
-system, and to write metadata back to the file once the processing system has
-completed.
+このイベントペイロードには、アップロードされたファイルのコンテンツを読み込んで機械学習システムなどの処理システムに送信し、処理システムの完了後にファイルにメタデータを書き戻すために必要な情報がすべて含まれています。
 
-## Example Payload
+## ペイロードの例
 
 <Tabs>
 
-<Tab title='Skills JSON Payload'>
+<Tab title="Skills JSONペイロード">
 
 <!-- markdownlint-disable line-length -->
 
@@ -139,38 +134,30 @@ completed.
 
 </Tabs>
 
-## Payload Components
+## ペイロードのコンポーネント
 
-The Skills event payload can be broken down into the following top level objects:
+Skillsイベントペイロードは、以下の最上位オブジェクトに分類できます。
 
 <!-- markdownlint-disable line-length -->
 
-| Object       | Description                                                                                                                                                                                                                                                                                                |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `type`       | The type of event, which will always be `skill_invocation`.                                                                                                                                                                                                                                                |
-| `skill`      | Details of the Custom Skills app that sent the event. This information should be used to verify the source of the request.                                                                                                                                                                                 |
-| `token`      | Two [downscoped tokens](guide://authentication/access-tokens/downscope) for accessing the uploaded file. The `read` token should be used to download the file for the processing system, and the `write` token should be used to store metadata back to the uploaded file once the processing is complete. |
-| `status`     | The status of the event.                                                                                                                                                                                                                                                                                   |
-| `id`         | The unique event ID                                                                                                                                                                                                                                                                                        |
-| `created_at` | When the event was created.                                                                                                                                                                                                                                                                                |
-| `trigger`    | The type of action that triggered the event.                                                                                                                                                                                                                                                               |
-| `enterprise` | Information about the Enterprise where the event was triggered from. This information should be used to verify the source of the request.                                                                                                                                                                  |
-| `source`     | Information on the file that was uploaded that triggered the event. Use this information to make API requests to download the file and store metadata back to the file.                                                                                                                                    |
-| `event`      | The Skills event information.                                                                                                                                                                                                                                                                              |
-| `parameters` | Additional details that may be sent with the event.                                                                                                                                                                                                                                                        |
+| Object       | 説明                                                                                                                                                                                    |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`       | イベントのタイプ。常に`skill_invocation`です。                                                                                                                                                      |
+| `skill`      | イベントを送信したカスタムSkillsアプリの詳細情報。この情報はリクエストの送信元を検証する際に使用します。                                                                                                                               |
+| `token`      | アップロードされたファイルにアクセスするための2つの[ダウンスコープされたトークン](guide://authentication/access-tokens/downscope)。`read`トークンは処理システム用にファイルをダウンロードする際に使用し、`write`トークンは処理の完了後にアップロードされたファイルにメタデータを再保存する際に使用します。 |
+| `status`     | イベントのステータス。                                                                                                                                                                           |
+| `id`         | 一意のイベントID。                                                                                                                                                                            |
+| `created_at` | イベントが作成された日時。                                                                                                                                                                         |
+| `trigger`    | イベントをトリガーしたアクションのタイプ。                                                                                                                                                                 |
+| `enterprise` | イベントのトリガー元である会社についての情報。この情報は、リクエストの送信元を検証する際に使用します。                                                                                                                                   |
+| `source`     | イベントをトリガーした、アップロードされたファイルについての情報。この情報は、ファイルをダウンロードして、そのファイルにメタデータを再保存するAPIリクエストを作成する際に使用します。                                                                                          |
+| `event`      | Skillsイベントの情報。                                                                                                                                                                        |
+| `parameters` | イベントと共に送信される可能性がある追加情報。                                                                                                                                                               |
 
 <!-- markdownlint-enable line-length -->
 
-At a bare minimum, the following three pieces of information needed to download
-the file and update metadata for the file:
+ファイルをダウンロードし、そのファイルのメタデータを更新するには、少なくとも以下の3つの情報が必要です。
 
-- **Read token**: Located within the `token` object, the read token will allow
-you   to call the [download file endpoint](endpoint://get_files_id) to
-download the file content to send to the processing system.
-- **Write token**: Located within the `token` object, the write token will allow
-you to call the
-[create metadata on file endpoint](e://post_files_id_metadata_id_id)
-once the file processing has completed.
-- **File ID**: Located within the `source` object, the file ID will be needed by
-the above two endpoints to determine which file should be downloaded or have
-metadata applied to it.
+* **読み取りトークン**: `token`オブジェクト内の読み取りトークンを使用すると、[ファイルをダウンロード](endpoint://get_files_id)エンドポイントを呼び出し、処理システムに送信するファイルコンテンツをダウンロードできます。
+* **書き込みトークン**: ファイル処理の終了後、`token`オブジェクト内の書き込みトークンを使用すると、[ファイルメタデータを作成](e://post_files_id_metadata_id_id)エンドポイントを呼び出すことができます。
+* **ファイルID**: `source`オブジェクト内にあります。上記の2つのエンドポイントで、ダウンロードするファイルまたはメタデータを適用するファイルを特定するには、このファイルIDが必要です。
